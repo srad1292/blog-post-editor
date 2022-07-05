@@ -5,8 +5,9 @@
   <button (click)="onItalicize()">I</button>
   <button (click)="onUnderline()">U</button>
   <button (click)="onCode()">Code</button>
-  <button>Image</button>
-  <button>Link</button>
+  <input type="file" class="file-input" accept="image/*" (change)="onFileSelected($event)" #fileUpload>
+  <button (click)="fileUpload.click()">Image</button>
+  <button (click)="onLink()">Link</button>
 </div>
 
 <textarea 

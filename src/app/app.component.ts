@@ -4,7 +4,6 @@ import { Component, ElementRef, ViewChild, ViewEncapsulation } from '@angular/co
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  encapsulation: ViewEncapsulation.None,
 })
 export class AppComponent {
   title = 'angular-rich-text-editor';
@@ -14,6 +13,8 @@ export class AppComponent {
   editorData: String = '<p></p>';
 
   htmlData: String = '';
+
+  imgSrcList: string[] = [];
 
   public onTextChange(event: String): void {
     // console.log({event});
@@ -51,6 +52,25 @@ export class AppComponent {
     this.insertElements(["pre", "code"]);
   }
 
+  public onFileSelected(event: Event) {
+    let target = event?.target as HTMLInputElement;
+    if(target.files && target.files[0]) {
+      let file: File = target.files[0];
+      const reader = new FileReader();
+      reader.onload = e => {
+        if(reader.result) {
+          this.imgSrcList.push(reader.result.toString());
+          this.insertElementWithAttr("img", [`src="${reader.result.toString()}"`]);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  public onLink(): void {
+    this.insertElementWithAttr("a", [`target="blank"`, `href=""`]);
+  }
+
   private insertElement(element: string) {
     let input = this.textArea.nativeElement;
     if(input.selectionStart === input.selectionEnd) {
@@ -58,6 +78,17 @@ export class AppComponent {
       this.htmlData = this.editorData;
     } else {
       this.editorData = this.editorData.slice(0, input.selectionStart) + `<${element}>` + this.editorData.slice(input.selectionStart, input.selectionEnd) + `</${element}>` + this.editorData.slice(input.selectionEnd);
+      this.htmlData = this.editorData;
+    }
+  }
+
+  private insertElementWithAttr(element: string, attr: string[]) {
+    let input = this.textArea.nativeElement;
+    if(input.selectionStart === input.selectionEnd) {
+      this.editorData = this.editorData.slice(0, input.selectionStart) + `<${element} ${attr.join(' ')}></${element}>` + this.editorData.slice(input.selectionEnd);
+      this.htmlData = this.editorData;
+    } else {
+      this.editorData = this.editorData.slice(0, input.selectionStart) + `<${element} ${attr.join(' ')}>` + this.editorData.slice(input.selectionStart, input.selectionEnd) + `</${element}>` + this.editorData.slice(input.selectionEnd);
       this.htmlData = this.editorData;
     }
   }
